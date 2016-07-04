@@ -6,7 +6,7 @@ Problem Url: http://node.locomote.com/code-task/
 
 ## Usage
 
-
+    To start the process run : start.sh
 
 ## Developing
 
