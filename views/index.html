@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+	font-family: Verdanda;
+	margin: 10px;
+}
+* {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+form {
+	float: left;
+	min-width: 300px;
+	width: 30%;
+}
+fieldset {
+	padding: 0 1em 1em 1em;
+	width:49%;
+	float:left;
+}
+legend {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+fieldset > div > label {
+	font-weight: bold;
+	display: block;
+	margin: 0.7em 0 0.3em 0;
+}
+.resultdiv {
+	padding: 10px 0px;
+}
+input {
+	padding: 0.5em;
+	font-size: 1em;
+}
+.ui-spinner {
+	width: 100%;
+	padding: 0.2em;
+}
+select {
+	width: 200px;
+}
+.ui-priority-primary {
+	background: green;
+	color: white;
+	font-weight: normal;
+}
+#lookup {
+	margin-top: 1em;
+}
+
+.ui-progressbar-value {
+	-moz-box-sizing: content-box;
+	box-sizing: content-box;
+}
+.ui-autocomplete {
+	max-height: 200px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+#flights-container {
+	margin-top: 0.6em;
+	width: 100%;
+	padding: 0 1em;
+}
+table {
+	border-collapse: collapse;
+	width: 100%;
+}
+tbody tr:nth-child(even) {
+	background: #e7e7e7;
+}
+th {
+	border-bottom: 2px solid #ddd;
+}
+th, td {
+	text-align: left;
+	padding: 0.8em;
+}
+td {
+	border-top: 1px solid #ddd;
+}
+caption {
+	font-size: 1.5em;
+	font-weight: bold;
+	padding-bottom: 0.5em;
+}
+caption span {
+	font-size: 0.8em;
+}
+
+@media (max-width: 1025px) {
+	#flights-container {
+		width: calc( 100% - 320px );
+	}
+}
+@media (max-width: 800px) {
+	#flights-container, form {
+		width: 100%;
+	}
+	input, .ui-spinner {
+		width: 200px;
+	}
+	.ui-buttonset, .ui-selectmenu-button {
+		font-size: 0.9em;
+	}
+	fieldset > div {
+		float: left;
+		margin-left: 0.5em;
+		height: 70px;
+		width: 210px;
+	}
+	fieldset > div:last-child {
+		width: 100%;
+	}
+}
+
+@media (max-width: 500px) {
+	td, th {
+		padding: 0.8em 0.1em;
+	}
+	#flights-container {
+		padding: 0;
+	}
+	fieldset > div {
+		width: 100%;
+	}
+}
+</style>
+<body>
+	<fieldset>
+		<legend>Find a Flight</legend> 
+
+		<div>
+			<label for="Airline name">Airline name:</label>
+			<select id="airline-name" required >
+				<option value="">Airline</option>
+  				<option value="QF">Qantas </option>
+  				<option value="SU">Aeroflot</option>
+  				<option value="MU">China Eastern</option>
+  				<option value="EK">Emirates</option>
+  				<option value="KE">Korean Air lines</option>
+  				<option value="SQ">Singapore Airlines</option>
+			</select>
+		</div>
+
+		<div>
+			<label for="from-airport">From:</label>
+			<select id="from-airport" required>
+  				<option value="">To Airport</option>
+  				<option value="SYD">Sydney</option>
+  				<option value="NYC">New York</option>
+			</select>
+		</div>
+		<div>
+			<label for="to-airport">To:</label>
+			<select id="to-airport" required >
+				<option value="">To Airport</option>
+  				<option value="SYD">Sydney</option>
+  				<option value="NYC">New York</option>
+			</select>
+		</div>
+		<div>
+			<label for="date">Date:</label>
+			<input type="date" id="date" placeholder="yyyy-mm-dd" required>
+		</div>
+		<div>
+			<button id="lookup" class="ui-priority-primary" onclick = "search()">Search</button>
+		</div>
+	</fieldset>
+
+<div id="flights-container">
+
+</div>
+</body>
+<script>
+function search(){
+	var date = document.getElementById("date");
+	date = date.value;
+
+	var airline = document.getElementById("airline-name");
+	airline = airline.options[airline.selectedIndex].value;
+	console.log(airline);
+
+
+	var fromAirport = document.getElementById("from-airport");
+	fromAirport = fromAirport.options[fromAirport.selectedIndex].value;
+	console.log(fromAirport);
+	
+	var toAirport = document.getElementById("to-airport");
+	toAirport = toAirport.options[toAirport.selectedIndex].value;
+	console.log(toAirport);
+	
+	if(date === null || date === ""){
+		alert("Select date");
+		return;
+		
+	}else if(airline === "" || airline === null){
+		alert("Select to airline");
+		return;
+	}else if(fromAirport === "" || fromAirport === null){
+		alert("Select from Airport");
+		return;
+		
+	}else if(toAirport === "" || toAirport === null){
+		alert("Select to Airport");
+		return;
+	}else{
+		makeRequest(date, airline, fromAirport, toAirport);
+	}
+}
+
+
+function makeRequest(date, airline, fromAirport, toAirport){
+	var url = "http://mayank-optiplex-380:3000/flight_search/"+airline+"?date="+date+"&from="+fromAirport+"&to="+toAirport;  	
+	var data = makeAjaxRequest(url);
+}	
+
+
+function makeAjaxRequest(url) {
+	var xmlhttp = new XMLHttpRequest();
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
+        	try{
+	           if (xmlhttp.status == 200) {
+	               var data = JSON.parse(xmlhttp.response);
+	               if(data["statusCode"] === 404 && data["Message"] !== undefined){
+	            	   alert(data["Message"]);
+	               }else{
+		               makeList(data);
+	               }
+	           }
+	           else if (xmlhttp.status == 400) {
+	              alert('There was an error 400');
+	           }
+        		
+        	}catch(e){
+                alert('try after some time');
+        	}
+           
+        }
+    };
+
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+};
+
+function makeList(data) {
+	var maindiv = document.getElementById('flights-container');
+	while (maindiv.firstChild) {
+		maindiv.removeChild(maindiv.firstChild);
+	}
+	var fieldset = document.createElement("fieldset");
+	var legend = document.createElement("legend");
+	legend.innerText = "Flight Details";
+	fieldset.appendChild(legend);
+	for ( var key in data) {
+		var div = document.createElement("div");
+		div.className = "resultdiv";
+		div.innerText = "Airline name : " + data[key]["airline"]["name"]
+				+ " , Start : " + data[key]["start"]["airportName"] + "("
+				+ data[key]["start"]["dateTime"] + ")" + " , Finish : "
+				+ data[key]["finish"]["airportName"] + " , Plane  : "
+				+ data[key]["plane"]["fullName"] + " ,Price  : "
+				+ data[key]["price"];
+		fieldset.appendChild(div);
+	}
+	maindiv.appendChild(fieldset);
+}
+</script>
+</html>
